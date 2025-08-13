@@ -14,16 +14,12 @@ jobs:
       with:
         python-version: '3.12'
         architecture: 'x64'
-    - name: Set up MSVC
-      uses: ilammy/msvc-dev-cmd@v1
-      if: contains(matrix.os, 'windows')
     - uses: seanmiddleditch/gha-setup-ninja@v5
     - name: Clone Qt repo
       run: |
         git clone https://code.qt.io/qt/qt5.git qt -b 6.8.3
         cd qt
-        perl init-repository.pl -f --module-subset=qt5compat,qt3d,qtbase,qtcharts,qtdeclarative,qtimageformats,qtlanguageserver,qtmqtt,qtmultimedia,qtnetworkauth,qtquick3d,qtquicktimeline,qtserialbus,qtserialport,qtshadertools,qtsvg,qtwebchannel,qtwebengine,qtwebsockets,qtwebview
-
+        perl init-repository.pl
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
       if: contains(matrix.os, 'windows')
