@@ -17,19 +17,25 @@ jobs:
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
       if: contains(matrix.os, 'windows')
-    - name: Compile static Qt version
+    - uses: seanmiddleditch/gha-setup-ninja@v5
+    - name: Clone Qt repo
       run: |
-        # Clone Qt6 repo
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 6.8.3
-        cd qt5
-        perl init-repository -f --module-subset=qt5compat,qt3d,qtbase,qtcharts,qtdeclarative,qtimageformats,qtlanguageserver,qtmqtt,qtmultimedia,qtnetworkauth,qtquick3d,qtquicktimeline,qtserialbus,qtserialport,qtshadertools,qtsvg,qtwebchannel,qtwebengine,qtwebsockets,qtwebview
-        # Create shadow build folder
-        cd ..
-        mkdir qt6_shadow
-        cd qt6_shadow
-        # Configure Qt5
-        ..\qt5\configure.bat -release -static -static-runtime -no-pch -optimize-size -platform win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license
+        git clone https://code.qt.io/qt/qt5.git qt -b 6.8.3
+        cd qt
+        perl init-repository.pl -f --module-subset=qt5compat,qt3d,qtbase,qtcharts,qtdeclarative,qtimageformats,qtlanguageserver,qtmqtt,qtmultimedia,qtnetworkauth,qtquick3d,qtquicktimeline,qtserialbus,qtserialport,qtshadertools,qtsvg,qtwebchannel,qtwebengine,qtwebsockets,qtwebview
+
+    - name: Set up MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      if: contains(matrix.os, 'windows')
+
+    - name: Build Qt (Windows)
+      if: contains(matrix.os, 'windows')
+      env:
+        CL: /MP # Build with multiple processes
+      run: |
+        mkdir qt_build
+        cd qt_build
+        ..\qt\configure.bat -release -static -static-runtime -no-pch -optimize-size win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license
         cmake --build . --parallel 4
         cmake --install .
     - name: Package binaries
