@@ -9,11 +9,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
     - name: Compile static Qt version
       run: |
         # Clone Qt6 repo
@@ -26,7 +21,7 @@ jobs:
         mkdir qt6_shadow
         cd qt6_shadow
         # Setup the compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat`" amd64 && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         # Configure Qt5
         ..\qt5\configure.bat -release -static -static-runtime -no-pch -optimize-size -platform win32-msvc -prefix "..\Qt6_binaries" -no-feature-accessibility -confirm-license
